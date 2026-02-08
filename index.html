@@ -72,7 +72,7 @@
             white-space: normal;
             line-height: 1.1;
             padding: 6px;
-            transition: all 0.25s ease;
+            transition: opacity 0.3s ease, all 0.25s ease;
         }
 
         .modal-overlay {
@@ -167,7 +167,7 @@
             <p class="details">
                 📍 <strong>Elante Mall, Chandigarh</strong><br>
                 🕖 <strong>Time - Your choice</strong><br>
-                📅 <strong>14th February</strong>
+                📅 <strong>22nd February</strong>
             </p>
 
             <p class="note">
@@ -254,21 +254,27 @@
 
             if (noClickCount < noMessages.length) {
                 noBtn.textContent = noMessages[noClickCount];
-            }
 
-            const scaleAmount = 1 + (noClickCount * 0.25);
-            yesBtn.style.transform = `scale(${scaleAmount})`;
+                const scaleAmount = 1 + (noClickCount * 0.25);
+                yesBtn.style.transform = `scale(${scaleAmount})`;
 
-            yesBtn.animate([
-                { transform: `scale(${scaleAmount}) translateX(-2px)` },
-                { transform: `scale(${scaleAmount}) translateX(2px)` },
-                { transform: `scale(${scaleAmount}) translateX(0)` }
-            ], { duration: 150 });
+                yesBtn.animate([
+                    { transform: `scale(${scaleAmount}) translateX(-2px)` },
+                    { transform: `scale(${scaleAmount}) translateX(2px)` },
+                    { transform: `scale(${scaleAmount}) translateX(0)` }
+                ], { duration: 150 });
 
-            noClickCount++;
+                noClickCount++;
 
-            if (noClickCount > 6) {
-                noBtn.style.opacity = "0.5";
+                if (noClickCount === noMessages.length) {
+
+                    noBtn.style.opacity = "0";
+                    noBtn.style.pointerEvents = "none";
+
+                    setTimeout(() => {
+                        noBtn.style.display = "none";
+                    }, 300);
+                }
             }
         });
 
