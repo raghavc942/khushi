@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Important Question 💖</title>
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .card {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            width: min(90vw, 520px);
+        }
+
+        h1 {
+            margin-bottom: 35px;
+            color: #e91e63;
+            font-size: clamp(22px, 4vw, 32px);
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        #yesBtn {
+            background: #22c55e;
+            color: white;
+            width: 160px;
+            height: 52px;
+            font-size: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        #noBtn {
+            background: #ef4444;
+            color: white;
+            width: 160px;
+            height: 52px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: normal;
+            line-height: 1.1;
+            padding: 6px;
+            transition: all 0.25s ease;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 340px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            animation: pop 0.3s ease;
+        }
+
+        .modal h2 {
+            color: #e91e63;
+            margin-bottom: 15px;
+        }
+
+        .modal .details {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .modal .note {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .close-btn {
+            background: #e91e63;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 22px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        #confettiCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes pop {
+            from {
+                transform: scale(0.85);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h1>Will you be my valentine? 💕</h1>
+
+        <div class="btn-row">
+            <button id="yesBtn">Yes ❤️</button>
+            <button id="noBtn">No 🙄</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h2>Yayyyyyyy!!!</h2>
+            <h3>Looking forward to meeting you 😊</h3>
+            <p class="details">
+                📍 <strong>Elante Mall, Chandigarh</strong><br>
+                🕖 <strong>Time - Your choice</strong><br>
+                📅 <strong>22nd February</strong>
+            </p>
+
+            <p class="note">
+                Just a cup of coffee and a chance to get to know you better ☺️
+            </p>
+
+            <button class="close-btn" id="closeModal">Can’t wait</button>
+        </div>
+    </div>
+
+    <canvas id="confettiCanvas"></canvas>
+
+    <script>
+        const noBtn = document.getElementById("noBtn");
+        const yesBtn = document.getElementById("yesBtn");
+        const card = document.querySelector(".card");
+
+        let noClickCount = 0;
+
+        const noMessages = [
+            "Are you sure? 😢",
+            "Think again… 🥺",
+            "Please reconsider 🙈",
+            "I'll be sad 💔",
+            "What if I promise good coffee + jokes? 👉🏻👈🏻",
+            "Maybe give it another thought? 😊",
+            "The green button looks nice 👀",
+            "What if future you thanks you for pressing yes? 😌",
+            "That felt like a misclick 👀",
+            "What if this turns into your favorite evening? 😌",
+            "Don't break my heart 😭",
+            "Last chance… ❤️"
+        ];
+
+        const canvas = document.getElementById("confettiCanvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let confettiPieces = [];
+
+        function launchConfetti() {
+
+            confettiPieces = [];
+
+            for (let i = 0; i < 120; i++) {
+                confettiPieces.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 6 + 4,
+                    speed: Math.random() * 3 + 2,
+                    angle: Math.random() * 360
+                });
+            }
+
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            confettiPieces.forEach(p => {
+                p.y += p.speed;
+                p.angle += 5;
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle * Math.PI / 180);
+                ctx.fillStyle = `hsl(${Math.random() * 360},70%,60%)`;
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                ctx.restore();
+            });
+
+            confettiPieces = confettiPieces.filter(p => p.y < canvas.height);
+
+            if (confettiPieces.length > 0) {
+                requestAnimationFrame(animateConfetti);
+            }
+        }
+
+        noBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            if (noClickCount < noMessages.length) {
+                noBtn.textContent = noMessages[noClickCount];
+            }
+
+            const scaleAmount = 1 + (noClickCount * 0.25);
+            yesBtn.style.transform = `scale(${scaleAmount})`;
+
+            yesBtn.animate([
+                { transform: `scale(${scaleAmount}) translateX(-2px)` },
+                { transform: `scale(${scaleAmount}) translateX(2px)` },
+                { transform: `scale(${scaleAmount}) translateX(0)` }
+            ], { duration: 150 });
+
+            noClickCount++;
+
+            if (noClickCount > 6) {
+                noBtn.style.opacity = "0.5";
+            }
+        });
+
+        yesBtn.onclick = () => {
+            document.getElementById("modal").classList.add("show");
+
+            launchConfetti();
+
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 200]);
+            }
+        };
+
+        const modal = document.getElementById("modal");
+        const closeModal = document.getElementById("closeModal");
+
+        function resetCardState() {
+
+            noClickCount = 0;
+
+            noBtn.textContent = "No 🙄";
+            yesBtn.textContent = "Yes ❤️";
+
+            yesBtn.style.transform = "scale(1)";
+
+            noBtn.style.opacity = "1";
+        }
+
+        closeModal.onclick = () => {
+            modal.classList.remove("show");
+            resetCardState();
+        };
+
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.classList.remove("show");
+                resetCardState();
+            }
+        };
+    </script>
+</body>
+
+</html>
