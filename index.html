@@ -72,7 +72,7 @@
             white-space: normal;
             line-height: 1.1;
             padding: 6px;
-            transition: opacity 0.3s ease, all 0.25s ease;
+            transition: all 0.25s ease, opacity 0.3s ease;
         }
 
         .modal-overlay {
@@ -152,7 +152,7 @@
 <body>
 
     <div class="card">
-        <h1>Will you be my valentine? 💕</h1>
+        <h1>Will you be my Valetine? 💕</h1>
 
         <div class="btn-row">
             <button id="yesBtn">Yes ❤️</button>
@@ -170,11 +170,7 @@
                 📅 <strong>14th February</strong>
             </p>
 
-            <p class="note">
-                Just a cup of coffee and a chance to get to know you better ☺️
-            </p>
-
-            <button class="close-btn" id="closeModal">Can’t wait</button>
+            <button class="close-btn" id="closeModal">Can’t wait 😍</button>
         </div>
     </div>
 
@@ -186,6 +182,8 @@
         const card = document.querySelector(".card");
 
         let noClickCount = 0;
+
+        let escapeMode = false;
 
         const noMessages = [
             "Are you sure? 😢",
@@ -249,10 +247,31 @@
             }
         }
 
+        function moveButton() {
+
+            const maxX = card.clientWidth - noBtn.offsetWidth;
+            const maxY = card.clientHeight - noBtn.offsetHeight;
+
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY;
+
+            noBtn.style.position = "absolute";
+            noBtn.style.left = x + "px";
+            noBtn.style.top = y + "px";
+        }
+
+        let noConvertedToYes = false;
+
         noBtn.addEventListener("click", (e) => {
-            e.preventDefault();
+
+            if (escapeMode) {
+                e.preventDefault();
+                moveButton();
+                return;
+            }
 
             if (noClickCount < noMessages.length) {
+
                 noBtn.textContent = noMessages[noClickCount];
 
                 const scaleAmount = 1 + (noClickCount * 0.25);
@@ -267,25 +286,51 @@
                 noClickCount++;
 
                 if (noClickCount === noMessages.length) {
-
-                    noBtn.style.opacity = "0";
-                    noBtn.style.pointerEvents = "none";
-
-                    setTimeout(() => {
-                        noBtn.style.display = "none";
-                    }, 300);
+                    escapeMode = true;
                 }
             }
         });
 
+        card.addEventListener("mousemove", (e) => {
+
+            if (!escapeMode) return;
+
+            const rect = noBtn.getBoundingClientRect();
+
+            const distance = Math.hypot(
+                e.clientX - (rect.left + rect.width / 2),
+                e.clientY - (rect.top + rect.height / 2)
+            );
+
+            if (distance < 100) {
+                moveButton();
+            }
+        });
+
+        noBtn.addEventListener("touchstart", (e) => {
+
+            if (!escapeMode) return;
+
+            e.preventDefault();
+            moveButton();
+        });
+
         yesBtn.onclick = () => {
+
             document.getElementById("modal").classList.add("show");
 
             launchConfetti();
 
-            if (navigator.vibrate) {
-                navigator.vibrate([100, 50, 200]);
+            if ("vibrate" in navigator) {
+                navigator.vibrate(200);
             }
+
+            noBtn.style.opacity = "0";
+            noBtn.style.pointerEvents = "none";
+
+            setTimeout(() => {
+                noBtn.style.display = "none";
+            }, 300);
         };
 
         const modal = document.getElementById("modal");
